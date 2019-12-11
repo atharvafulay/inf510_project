@@ -6,14 +6,14 @@ def calculations(groups, prices_df):
     """
     does the calculations and puts together list of sector performances
     :param groups: dictionary of sectors and the symbols within them
-    :param prices_df: pandas DataFrame of prices of stocks within 90 days
+    :param prices_df: pandas DataFrame of prices of stocks within 100 days
     :return: [analysis_dict, dates]
 
-    analysis_dict is the mapping from sector name to a list of its performance within the past 90 days
+    analysis_dict is the mapping from sector name to a list of its performance within the past 100 days
     dates is a list of dates that were used to measure the prices
     """
-    every_10_days = [i for i in range(99, 0, -2)]
-    every_10_days.append(0)
+    every_n_days = [i for i in range(99, 0, -5)]
+    every_n_days.append(0)
     analysis_dict = dict()
     dates_set = set()
 
@@ -26,7 +26,7 @@ def calculations(groups, prices_df):
         num_stock = None
 
         # want to get shortest list of stocks in case there is an error, missing values, etc.
-        for d in every_10_days:
+        for d in every_n_days:
             # narrow to current day's prices
             curr_day_df = prices_df[prices_df['date'] == prices_df.loc[d]['date']]
 
@@ -36,7 +36,7 @@ def calculations(groups, prices_df):
             if len(curr_final_symbs) == 0 or len(curr_symbols) < len(curr_final_symbs):
                 curr_final_symbs = curr_symbols
 
-        for day in every_10_days:
+        for day in every_n_days:
 
             # narrow to current day's prices
             curr_day_df = prices_df[prices_df['date'] == prices_df.loc[day]['date']]
@@ -65,7 +65,7 @@ def calculations(groups, prices_df):
                 if len(normalized_prices) > 0:
                     normalized_prices.append(normalized_prices[-1])
                 else:
-                    print(f'There was an error while trying to do the analysis. {e}')
+                    print(f'There was an error while trying to do the analysis. Ending program. {e}')
                     exit()
 
         analysis_dict[group] = normalized_prices
@@ -78,7 +78,7 @@ def calculations(groups, prices_df):
 def generate_image(analysis_dict, dates, ow):
     """
     creates an image with from the analysis of each sector
-    :param analysis_dict: the mapping from sector name to a list of its performance within the past 90 days
+    :param analysis_dict: the mapping from sector name to a list of its performance within the past 100 days
     :param dates: a list of dates that were used to measure the prices
     :param ow: bool of whether to overwrite the image generated.
     :return: nothing is returned
@@ -114,16 +114,15 @@ def generate_image(analysis_dict, dates, ow):
         plt.savefig('sector_performances.png')
         print('Image was saved as "sector_performances.png" if you would like to refer to it.')
 
-    print('You will need to close the image for the program to end.')
     plt.show()
 
     # display to user which sector performed best
     if curr_max >= 0.00:
         print(f'\n------\nThe best performing sector was {sect}, improving by {round(curr_max, 2)} percent over the '
-              f'past 90 days.')
+              f'past 100 days.')
     else:
         print(f'\n------\nThe best performing sector was {sect}, only decreasing by {round(curr_max, 2)} '
-              f'percent over the past 90 days.')
+              f'percent over the past 100 days.')
 
     return sect
 
@@ -132,7 +131,7 @@ def analysis_driver(symbols_df, prices_df, overwrite):
     """
     calls the appropriate analysis functions based on data and user input
     :param symbols_df: pandas DataFrame that has all symbols and sector data
-    :param prices_df: pandas DataFrame that contains prices for symbols over past 90 days
+    :param prices_df: pandas DataFrame that contains prices for symbols over past 100 days
     :param overwrite: bool of whether to overwrite analyzed DataFrame and image
     :return:
     """

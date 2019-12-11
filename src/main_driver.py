@@ -2,7 +2,7 @@ import scrape_swingtradebot as stb
 import alphavantage_api as av
 import analysis as an
 import pandas as pd
-import argparse
+import argparse 
 
 
 def scrape_driver(overwrite, max_page_num):
