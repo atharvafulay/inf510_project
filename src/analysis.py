@@ -22,7 +22,7 @@ def calculations(groups, prices_df):
         prices = list()
         normalized_prices = list()
         curr_final_symbs = list()
-
+        drop_group = False
         num_stock = None
 
         # want to get shortest list of stocks in case there is an error, missing values, etc.
@@ -33,8 +33,11 @@ def calculations(groups, prices_df):
             curr_price_df = curr_day_df[curr_day_df['symbol'].isin(groups[group])]
             curr_symbols = list(curr_price_df['symbol'])
 
-            if len(curr_final_symbs) == 0 or len(curr_symbols) < len(curr_final_symbs):
+            if len(curr_final_symbs) == 0:
                 curr_final_symbs = curr_symbols
+            elif len(curr_symbols) < len(curr_final_symbs):
+                # intersection of the two lists
+                curr_final_symbs = [value for value in curr_symbols if value in curr_final_symbs]
 
         for day in every_n_days:
 
@@ -65,10 +68,11 @@ def calculations(groups, prices_df):
                 if len(normalized_prices) > 0:
                     normalized_prices.append(normalized_prices[-1])
                 else:
-                    print(f'There was an error while trying to do the analysis. Ending program. {e}')
-                    exit()
+                    # don't use this group if error can't be resolved
+                    drop_group = True
 
-        analysis_dict[group] = normalized_prices
+        if not drop_group:
+            analysis_dict[group] = normalized_prices
 
     # ordered list of dates (for image)
     dates = list(sorted(dates_set))
@@ -144,5 +148,6 @@ def analysis_driver(symbols_df, prices_df, overwrite):
         df.to_csv('sector_analysis.csv', encoding='utf-8')
         print('sector_analysis.csv was generated.')
 
+    print('You will have to close the image for the program to finish.')
     best_sector = generate_image(analysis_dict, dates, overwrite)
     print(f'Stocks within the {best_sector} sector: {groups[best_sector]}')
