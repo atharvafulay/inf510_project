@@ -17,3 +17,7 @@ Example: $ python fulay_atharva.py -source=local -overwrite=0
 This program requires these packages along with Python 3.7: pandas, matplotlib.pyplot, argparse, BeautifulSoup (from bs4 import BeautifulSoup), requests, time, csv, copy
 
 The fulay_atharva.ipynb has some of the analysis more broken out and explained. 
+
+Final output will look something like this:
+
+![final_output](/images/sector_performances.png)
